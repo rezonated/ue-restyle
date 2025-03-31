@@ -3,6 +3,8 @@ This is a fork of ue-restyle, created by [AgitoReiKen](https://github.com/AgitoR
 
 I made this fork aiming to keep support for the latest Unreal Engine major release.
 
+If you're looking for the refund, kindly go to the original repo and follow the instructions found in its README.md.
+
 ## Currently supported UE version: 5.5.4
 
 # Original README.md:
