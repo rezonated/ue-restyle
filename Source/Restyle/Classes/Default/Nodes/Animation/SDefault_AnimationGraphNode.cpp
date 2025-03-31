@@ -190,7 +190,7 @@ public:
 
 	SLATE_END_ARGS()
 
-	PRAGMA_DISABLE_OPTIMIZATION
+	UE_DISABLE_OPTIMIZATION
 
 	void Construct(const FArguments& InArgs, UAnimGraphNode_Base* InNode)
 	{
@@ -435,7 +435,7 @@ public:
 		}
 	}
 
-	PRAGMA_ENABLE_OPTIMIZATION
+	UE_ENABLE_OPTIMIZATION
 	// Property row generator used to display function properties on nodes
 	TSharedPtr<IPropertyRowGenerator> PropertyRowGenerator;
 

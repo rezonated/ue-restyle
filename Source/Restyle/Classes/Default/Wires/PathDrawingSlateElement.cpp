@@ -413,12 +413,12 @@ void FPathDrawingSlateElement::DrawRenderThread(
 	check(IsInRenderingThread());
 	FVertexBuffer _VertexBuffer;
 	FIndexBuffer _IndexBuffer;
-	_VertexBuffer.InitResource();
-	_IndexBuffer.InitResource();
+	_VertexBuffer.InitResource(RHICmdList);
+	_IndexBuffer.InitResource(RHICmdList);
 	uint32 NumVerticesToRender = 0;
 	uint32 NumPrimitivesToRender = 0;
 
-	const FTexture2DRHIRef& Buffer = static_cast<const FTexture2DRHIRef*>(InWindowBackBuffer)->GetReference();
+	const FTextureRHIRef& Buffer = static_cast<const FTextureRHIRef*>(InWindowBackBuffer)->GetReference();
 	FVector2f ViewportSize(Buffer->GetSizeX(), Buffer->GetSizeY());
 	{
 		TShaderMapRef<FRestyleVertexShader> VertexShader(

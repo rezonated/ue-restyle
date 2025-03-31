@@ -630,14 +630,14 @@ void SDefault_GraphPinCollisionProfile::GetPropertyAsName(FName& OutName) const
 
 	if (PinString.StartsWith(TEXT("("), ESearchCase::CaseSensitive) && PinString.EndsWith(
 		TEXT(")"), ESearchCase::CaseSensitive)) {
-		PinString.LeftChopInline(1, false);
-		PinString.RightChopInline(1, false);
+		PinString.LeftChopInline(1, EAllowShrinking::No);
+		PinString.RightChopInline(1, EAllowShrinking::No);
 		PinString.Split(TEXT("="), nullptr, &PinString, ESearchCase::CaseSensitive);
 
 		if (PinString.StartsWith(TEXT("\""), ESearchCase::CaseSensitive) && PinString.EndsWith(
 			TEXT("\""), ESearchCase::CaseSensitive)) {
-			PinString.LeftChopInline(1, false);
-			PinString.RightChopInline(1, false);
+			PinString.LeftChopInline(1, EAllowShrinking::No);
+			PinString.RightChopInline(1, EAllowShrinking::No);
 		}
 	}
 
@@ -1585,7 +1585,6 @@ FReply SDefault_GraphPinColor::OnColorBoxClicked(const FGeometry& MyGeometry, co
 		PickerArgs.ParentWidget = DefaultValueWidget;
 		PickerArgs.DisplayGamma = TAttribute<float>::Create(
 			TAttribute<float>::FGetter::CreateUObject(GEngine, &UEngine::GetDisplayGamma));
-		PickerArgs.LinearColorArray = &LinearColorArray;
 		PickerArgs.OnColorCommitted = FOnLinearColorValueChanged::CreateSP(
 			this, &SDefault_GraphPinColor::OnColorCommitted);
 		PickerArgs.bUseAlpha = true;

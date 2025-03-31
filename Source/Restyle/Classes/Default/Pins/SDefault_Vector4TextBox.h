@@ -4,7 +4,8 @@
 #include "Widgets/SCompoundWidget.h"
 
 #define LOCTEXT_NAMESPACE "VectorTextBox"
-template<typename NumericType>
+
+template <typename NumericType>
 class SDefault_Vector4TextBox : public SCompoundWidget
 {
 public:
@@ -139,42 +140,21 @@ public:
 	}
 
 private:
-
 	NumericType GetValueType(const FString& InString) const
 	{
 		static_assert(std::is_floating_point_v<NumericType>);
 
-		if constexpr (std::is_same_v<float, NumericType>)
-		{
-			return FCString::Atof(*InString);
-		}
-		else if constexpr (std::is_same_v<double, NumericType>)
-		{
-			return FCString::Atod(*InString);
-		}
-
-		return NumericType{};
+		if constexpr (std::is_same_v<float, NumericType>) { return FCString::Atof(*InString); }
+		else if constexpr (std::is_same_v<double, NumericType>) { return FCString::Atod(*InString); }
 	}
 
-	TOptional<NumericType> GetTypeInValue_0() const
-	{
-		return GetValueType(VisibleText_0.Get());
-	}
+	TOptional<NumericType> GetTypeInValue_0() const { return GetValueType(VisibleText_0.Get()); }
 
-	TOptional<NumericType> GetTypeInValue_1() const
-	{
-		return GetValueType(VisibleText_1.Get());
-	}
+	TOptional<NumericType> GetTypeInValue_1() const { return GetValueType(VisibleText_1.Get()); }
 
-	TOptional<NumericType> GetTypeInValue_2() const
-	{
-		return GetValueType(VisibleText_2.Get());
-	}
+	TOptional<NumericType> GetTypeInValue_2() const { return GetValueType(VisibleText_2.Get()); }
 
-	TOptional<NumericType> GetTypeInValue_3() const
-	{
-		return GetValueType(VisibleText_3.Get());
-	}
+	TOptional<NumericType> GetTypeInValue_3() const { return GetValueType(VisibleText_3.Get()); }
 
 	TAttribute<FString> VisibleText_0;
 	TAttribute<FString> VisibleText_1;

@@ -1,8 +1,8 @@
 // Alexander (AgitoReiKen) Moskalenko (C) 2022
 
 #include "SDefault_TextPropertyEditableTextBox.h"
-#include "SDefault_EditableTextBox.h"
 #include <Runtime/Core/Public/Internationalization/TextNamespaceUtil.h>
+#include "SDefault_EditableTextBox.h"
 
 #include "Styling/StyleColors.h"
 #define LOCTEXT_NAMESPACE "STextPropertyEditableTextBox"
@@ -15,9 +15,7 @@ class STextPropertyEditableOptionRow : public SCompoundWidget
 {
 	SLATE_BEGIN_ARGS(STextPropertyEditableOptionRow)
 			: _IsHeader(false)
-			  , _ContentHAlign(HAlign_Fill)
-		{
-		}
+			  , _ContentHAlign(HAlign_Fill) {}
 
 		SLATE_ARGUMENT(bool, IsHeader)
 		SLATE_ARGUMENT(EHorizontalAlignment, ContentHAlign)
@@ -25,37 +23,34 @@ class STextPropertyEditableOptionRow : public SCompoundWidget
 		SLATE_DEFAULT_SLOT(FArguments, Content)
 	SLATE_END_ARGS()
 
-public:
 	void Construct(const FArguments& InArgs, TSharedRef<FLinkedBoxManager> InManager)
 	{
 		InArgs._Content.Widget->SetToolTip(GetToolTip());
 
-		if (InArgs._IsHeader)
-		{
+		if (InArgs._IsHeader) {
 			// Header row, text only, fills entire row
 			ChildSlot
 			[
 				SNew(SBorder)
-					.BorderImage(FAppStyle::GetBrush("DetailsView.GridLine"))
-					.Padding(FMargin(0, 0, 0, 1))
+				.BorderImage(FAppStyle::GetBrush("DetailsView.GridLine"))
+				.Padding(FMargin(0, 0, 0, 1))
 				[
 					SNew(SBorder)
-						.BorderImage(FAppStyle::GetBrush("DetailsView.CategoryTop"))
-						.BorderBackgroundColor(FSlateColor(FLinearColor::White))
-						.Padding(FMargin(12, 8, 0, 8))
-						.VAlign(VAlign_Center)
+					.BorderImage(FAppStyle::GetBrush("DetailsView.CategoryTop"))
+					.BorderBackgroundColor(FSlateColor(FLinearColor::White))
+					.Padding(FMargin(12, 8, 0, 8))
+					.VAlign(VAlign_Center)
 					[
 						SNew(STextBlock)
-							.TextStyle(FAppStyle::Get(), "DetailsView.CategoryTextStyle")
-							.Font(FAppStyle::Get().GetFontStyle("PropertyWindow.BoldFont"))
-							.Text(InArgs._Text)
-							.ToolTip(GetToolTip())
+						.TextStyle(FAppStyle::Get(), "DetailsView.CategoryTextStyle")
+						.Font(FAppStyle::Get().GetFontStyle("PropertyWindow.BoldFont"))
+						.Text(InArgs._Text)
+						.ToolTip(GetToolTip())
 					]
 				]
 			];
 		}
-		else
-		{
+		else {
 			// Non-header row, has a name column followed by a value widget
 			ChildSlot
 			[
@@ -97,7 +92,9 @@ public:
 						.HAlign(InArgs._ContentHAlign)
 						.VAlign(VAlign_Center)
 						[
-							InArgs._Content.Widget
+							InArgs
+							._Content
+							.Widget
 						]
 					]
 				]
@@ -111,10 +108,7 @@ public:
 private:
 	FSlateColor GetBackgroundColor() const
 	{
-		if (IsHovered())
-		{
-			return FStyleColors::Header;
-		}
+		if (IsHovered()) { return FStyleColors::Header; }
 
 		return FStyleColors::Panel;
 	}
@@ -123,8 +117,7 @@ private:
 bool SDefault_TextPropertyEditableTextBox::IsTextLocalizable() const
 {
 	const int32 NumTexts = EditableTextProperty->GetNumTexts();
-	if (NumTexts == 1)
-	{
+	if (NumTexts == 1) {
 		const FText PropertyValue = EditableTextProperty->GetText(0);
 		return !PropertyValue.IsCultureInvariant();
 	}
@@ -133,14 +126,8 @@ bool SDefault_TextPropertyEditableTextBox::IsTextLocalizable() const
 
 void SDefault_TextPropertyEditableTextBox::GetDesiredWidth(float& OutMinDesiredWidth, float& OutMaxDesiredWidth)
 {
-	if (bIsMultiLine)
-	{
-		OutMinDesiredWidth = 250.0f;
-	}
-	else
-	{
-		OutMinDesiredWidth = 125.0f;
-	}
+	if (bIsMultiLine) { OutMinDesiredWidth = 250.0f; }
+	else { OutMinDesiredWidth = 125.0f; }
 
 	OutMaxDesiredWidth = 600.0f;
 }
@@ -158,17 +145,16 @@ void SDefault_TextPropertyEditableTextBox::InConstruct(const FArguments& InArgs,
 
 	const bool bIsPassword = EditableTextProperty->IsPassword();
 	bIsMultiLine = EditableTextProperty->IsMultiLineText();
-	if (bIsMultiLine)
-	{
+	if (bIsMultiLine) {
 		ChildSlot
 		[
 			SAssignNew(HorizontalBox, SHorizontalBox)
 			+ SHorizontalBox::Slot()
-			  .VAlign(VAlign_Center)
-			  .FillWidth(1.0f)
+			.VAlign(VAlign_Center)
+			.FillWidth(1.0f)
 			[
 				SNew(SBox)
-				.MinDesiredWidth(InArgs._MinDesiredWidth) 
+				.MinDesiredWidth(InArgs._MinDesiredWidth)
 				[
 					SAssignNew(MultiLineWidget, SDefault_MultiLineEditableTextBox)
 					.Text(this, &SDefault_TextPropertyEditableTextBox::GetTextValue)
@@ -192,8 +178,7 @@ void SDefault_TextPropertyEditableTextBox::InConstruct(const FArguments& InArgs,
 
 		PrimaryWidget = MultiLineWidget;
 	}
-	else
-	{
+	else {
 		ChildSlot
 		[
 			SAssignNew(HorizontalBox, SHorizontalBox)
@@ -225,8 +210,8 @@ void SDefault_TextPropertyEditableTextBox::InConstruct(const FArguments& InArgs,
 	const TSharedRef<FLinkedBoxManager> LinkedBoxManager = MakeShared<FLinkedBoxManager>();
 	const FSlateFontInfo PropertyNormalFont = FAppStyle::Get().GetFontStyle("PropertyWindow.NormalFont");
 	HorizontalBox->AddSlot()
-	.AutoWidth()
-	[ 
+	             .AutoWidth()
+	[
 		SNew(SSpacer)
 		.Size(FVector2D(InArgs._Spacing, 0))
 	];
@@ -265,17 +250,17 @@ void SDefault_TextPropertyEditableTextBox::InConstruct(const FArguments& InArgs,
 				+ SVerticalBox::Slot()
 				[
 					SNew(STextPropertyEditableOptionRow, LinkedBoxManager)
-						.Text(LOCTEXT("TextLocalizableLabel", "Localize"))
-						.ToolTipText(LOCTEXT("TextLocalizableCheckBoxToolTip",
-						                     "Whether to assign this text a key and allow it to be gathered for localization.\nIf set to false, marks this text as 'culture invariant' to prevent it being gathered for localization."))
-						.ContentHAlign(HAlign_Left)
+					.Text(LOCTEXT("TextLocalizableLabel", "Localize"))
+					.ToolTipText(LOCTEXT("TextLocalizableCheckBoxToolTip",
+					                     "Whether to assign this text a key and allow it to be gathered for localization.\nIf set to false, marks this text as 'culture invariant' to prevent it being gathered for localization."))
+					.ContentHAlign(HAlign_Left)
 					[
 						SNew(SCheckBox)
-							.IsEnabled(this, &SDefault_TextPropertyEditableTextBox::IsCultureInvariantFlagEnabled)
-							.IsChecked(this, &SDefault_TextPropertyEditableTextBox::GetLocalizableCheckState)
-							.OnCheckStateChanged(
-							               this,
-							               &SDefault_TextPropertyEditableTextBox::HandleLocalizableCheckStateChanged)
+						.IsEnabled(this, &SDefault_TextPropertyEditableTextBox::IsCultureInvariantFlagEnabled)
+						.IsChecked(this, &SDefault_TextPropertyEditableTextBox::GetLocalizableCheckState)
+						.OnCheckStateChanged(
+							this,
+							&SDefault_TextPropertyEditableTextBox::HandleLocalizableCheckStateChanged)
 					]
 				]
 				+ SVerticalBox::Slot()
@@ -287,8 +272,8 @@ void SDefault_TextPropertyEditableTextBox::InConstruct(const FArguments& InArgs,
 				+ SVerticalBox::Slot()
 				[
 					SNew(STextPropertyEditableOptionRow, LinkedBoxManager)
-						.Text(LOCTEXT("TextStringTableLabel", "String Table"))
-						.IsEnabled(this, &SDefault_TextPropertyEditableTextBox::IsTextLocalizable)
+					.Text(LOCTEXT("TextStringTableLabel", "String Table"))
+					.IsEnabled(this, &SDefault_TextPropertyEditableTextBox::IsTextLocalizable)
 					[
 						SNew(STextPropertyEditableStringTableReference, InEditableTextProperty)
 						.AllowUnlink(true)
@@ -307,13 +292,13 @@ void SDefault_TextPropertyEditableTextBox::InConstruct(const FArguments& InArgs,
 				+ SVerticalBox::Slot()
 				[
 					SNew(STextPropertyEditableOptionRow, LinkedBoxManager)
-						.Text(LOCTEXT("TextPackageLabel", "Package"))
-						.IsEnabled(this, &SDefault_TextPropertyEditableTextBox::IsTextLocalizable)
+					.Text(LOCTEXT("TextPackageLabel", "Package"))
+					.IsEnabled(this, &SDefault_TextPropertyEditableTextBox::IsTextLocalizable)
 					[
 						SNew(SDefault_EditableTextBox)
-							.Text(this, &SDefault_TextPropertyEditableTextBox::GetPackageValue)
-							.Font(PropertyNormalFont)
-							.IsReadOnly(true)
+						.Text(this, &SDefault_TextPropertyEditableTextBox::GetPackageValue)
+						.Font(PropertyNormalFont)
+						.IsReadOnly(true)
 					]
 				]
 #endif // USE_STABLE_LOCALIZATION_KEYS
@@ -338,8 +323,8 @@ void SDefault_TextPropertyEditableTextBox::InConstruct(const FArguments& InArgs,
 				+ SVerticalBox::Slot()
 				[
 					SNew(STextPropertyEditableOptionRow, LinkedBoxManager)
-						.Text(LOCTEXT("TextKeyLabel", "Key"))
-						.IsEnabled(this, &SDefault_TextPropertyEditableTextBox::IsTextLocalizable)
+					.Text(LOCTEXT("TextKeyLabel", "Key"))
+					.IsEnabled(this, &SDefault_TextPropertyEditableTextBox::IsTextLocalizable)
 					[
 						SAssignNew(KeyEditableTextBox, SDefault_EditableTextBox)
 						.Text(this, &SDefault_TextPropertyEditableTextBox::GetKeyValue)
@@ -379,7 +364,7 @@ FReply SDefault_TextPropertyEditableTextBox::OnFocusReceived(const FGeometry& My
 	// Forward keyboard focus to our editable text widget
 	return FReply::Handled().SetUserFocus(PrimaryWidget.ToSharedRef(), InFocusEvent.GetCause());
 }
- 
+
 bool SDefault_TextPropertyEditableTextBox::CanEdit() const
 {
 	const bool bIsReadOnly = FTextLocalizationManager::Get().IsLocalizationLocked() ||
@@ -387,27 +372,17 @@ bool SDefault_TextPropertyEditableTextBox::CanEdit() const
 	return !bIsReadOnly;
 }
 
-bool SDefault_TextPropertyEditableTextBox::IsCultureInvariantFlagEnabled() const
-{
-	return !IsSourceTextReadOnly();
-}
+bool SDefault_TextPropertyEditableTextBox::IsCultureInvariantFlagEnabled() const { return !IsSourceTextReadOnly(); }
 
 bool SDefault_TextPropertyEditableTextBox::IsSourceTextReadOnly() const
 {
-	if (!CanEdit())
-	{
-		return true;
-	}
+	if (!CanEdit()) { return true; }
 
 	// We can't edit the source string of string table references
 	const int32 NumTexts = EditableTextProperty->GetNumTexts();
-	if (NumTexts == 1)
-	{
+	if (NumTexts == 1) {
 		const FText TextValue = EditableTextProperty->GetText(0);
-		if (TextValue.IsFromStringTable())
-		{
-			return true;
-		}
+		if (TextValue.IsFromStringTable()) { return true; }
 	}
 
 	return false;
@@ -415,20 +390,13 @@ bool SDefault_TextPropertyEditableTextBox::IsSourceTextReadOnly() const
 
 bool SDefault_TextPropertyEditableTextBox::IsIdentityReadOnly() const
 {
-	if (!CanEdit())
-	{
-		return true;
-	}
+	if (!CanEdit()) { return true; }
 
 	// We can't edit the identity of texts that don't gather for localization
 	const int32 NumTexts = EditableTextProperty->GetNumTexts();
-	if (NumTexts == 1)
-	{
+	if (NumTexts == 1) {
 		const FText TextValue = EditableTextProperty->GetText(0);
-		if (!TextValue.ShouldGatherForLocalization())
-		{
-			return true;
-		}
+		if (!TextValue.ShouldGatherForLocalization()) { return true; }
 	}
 
 	return false;
@@ -438,12 +406,10 @@ FText SDefault_TextPropertyEditableTextBox::GetToolTipText() const
 {
 	FText LocalizedTextToolTip;
 	const int32 NumTexts = EditableTextProperty->GetNumTexts();
-	if (NumTexts == 1)
-	{
+	if (NumTexts == 1) {
 		const FText TextValue = EditableTextProperty->GetText(0);
 
-		if (TextValue.IsFromStringTable())
-		{
+		if (TextValue.IsFromStringTable()) {
 			FName TableId;
 			FString Key;
 			FTextInspector::GetTableIdAndKey(TextValue, TableId, Key);
@@ -453,22 +419,17 @@ FText SDefault_TextPropertyEditableTextBox::GetToolTipText() const
 				FText::FromName(TableId), FText::FromString(Key)
 			);
 		}
-		else
-		{
+		else {
 			FTextId TextId;
 			const FString* SourceString = FTextInspector::GetSourceString(TextValue);
 
-			if (SourceString && TextValue.ShouldGatherForLocalization())
-			{
-				TextId = FTextInspector::GetTextId(TextValue);
-			}
+			if (SourceString && TextValue.ShouldGatherForLocalization()) { TextId = FTextInspector::GetTextId(TextValue); }
 
-			if (!TextId.IsEmpty())
-			{
+			if (!TextId.IsEmpty()) {
 				check(SourceString);
 
-				const FString Namespace = TextId.GetNamespace().GetChars();
-				const FString Key = TextId.GetKey().GetChars();
+				const FString Namespace = TextId.GetNamespace().ToString();
+				const FString Key = TextId.GetKey().ToString();
 
 				const FString PackageNamespace = TextNamespaceUtil::ExtractPackageNamespace(Namespace);
 				const FString TextNamespace = TextNamespaceUtil::StripPackageNamespace(Namespace);
@@ -484,8 +445,7 @@ FText SDefault_TextPropertyEditableTextBox::GetToolTipText() const
 	}
 
 	FText BaseToolTipText = EditableTextProperty->GetToolTipText();
-	if (FTextLocalizationManager::Get().IsLocalizationLocked())
-	{
+	if (FTextLocalizationManager::Get().IsLocalizationLocked()) {
 		const FText LockdownToolTip = FTextLocalizationManager::Get().IsGameLocalizationPreviewEnabled()
 			                              ? LOCTEXT("LockdownToolTip_Preview",
 			                                        "Localization is locked down due to the active game localization preview")
@@ -497,14 +457,8 @@ FText SDefault_TextPropertyEditableTextBox::GetToolTipText() const
 				                  BaseToolTipText);
 	}
 
-	if (LocalizedTextToolTip.IsEmptyOrWhitespace())
-	{
-		return BaseToolTipText;
-	}
-	if (BaseToolTipText.IsEmptyOrWhitespace())
-	{
-		return LocalizedTextToolTip;
-	}
+	if (LocalizedTextToolTip.IsEmptyOrWhitespace()) { return BaseToolTipText; }
+	if (BaseToolTipText.IsEmptyOrWhitespace()) { return LocalizedTextToolTip; }
 
 	return FText::Format(LOCTEXT("ToolTipCompleteFmt", "{0}\n\n{1}"), BaseToolTipText, LocalizedTextToolTip);
 }
@@ -514,14 +468,8 @@ FText SDefault_TextPropertyEditableTextBox::GetTextValue() const
 	FText TextValue;
 
 	const int32 NumTexts = EditableTextProperty->GetNumTexts();
-	if (NumTexts == 1)
-	{
-		TextValue = EditableTextProperty->GetText(0);
-	}
-	else if (NumTexts > 1)
-	{
-		TextValue = MultipleValuesText;
-	}
+	if (NumTexts == 1) { TextValue = EditableTextProperty->GetText(0); }
+	else if (NumTexts > 1) { TextValue = MultipleValuesText; }
 
 	return TextValue;
 }
@@ -534,8 +482,7 @@ void SDefault_TextPropertyEditableTextBox::OnTextChanged(const FText& NewText)
 
 	// Don't validate the Multiple Values text if there are multiple properties being set
 	if (NumTexts > 0 && (NumTexts == 1 || NewText.ToString().Equals(MultipleValuesText.ToString(),
-	                                                                ESearchCase::CaseSensitive)))
-	{
+	                                                                ESearchCase::CaseSensitive))) {
 		EditableTextProperty->IsValidText(NewText, TextErrorMsg);
 	}
 
@@ -549,42 +496,33 @@ void SDefault_TextPropertyEditableTextBox::OnTextCommitted(const FText& NewText,
 
 	// Don't commit the Multiple Values text if there are multiple properties being set
 	if (NumTexts > 0 && (NumTexts == 1 || !NewText.ToString().Equals(MultipleValuesText.ToString(),
-	                                                                 ESearchCase::CaseSensitive)))
-	{
+	                                                                 ESearchCase::CaseSensitive))) {
 		FText TextErrorMsg;
-		if (EditableTextProperty->IsValidText(NewText, TextErrorMsg))
-		{
+		if (EditableTextProperty->IsValidText(NewText, TextErrorMsg)) {
 			// Valid text; clear any error
 			SetTextError(FText::GetEmpty());
 		}
-		else
-		{
+		else {
 			// Invalid text; set the error and prevent the new text from being set
 			SetTextError(TextErrorMsg);
 			return;
 		}
 
 		const FString& SourceString = NewText.ToString();
-		for (int32 TextIndex = 0; TextIndex < NumTexts; ++TextIndex)
-		{
+		for (int32 TextIndex = 0; TextIndex < NumTexts; ++TextIndex) {
 			const FText PropertyValue = EditableTextProperty->GetText(TextIndex);
 
 			// Only apply the change if the new text is different
-			if (PropertyValue.ToString().Equals(NewText.ToString(), ESearchCase::CaseSensitive))
-			{
-				continue;
-			}
+			if (PropertyValue.ToString().Equals(NewText.ToString(), ESearchCase::CaseSensitive)) { continue; }
 
 			// Is the new text is empty, just use the empty instance
-			if (NewText.IsEmpty())
-			{
+			if (NewText.IsEmpty()) {
 				EditableTextProperty->SetText(TextIndex, FText::GetEmpty());
 				continue;
 			}
 
 			// Maintain culture invariance when editing the text
-			if (PropertyValue.IsCultureInvariant())
-			{
+			if (PropertyValue.IsCultureInvariant()) {
 				EditableTextProperty->SetText(TextIndex, FText::AsCultureInvariant(NewText.ToString()));
 				continue;
 			}
@@ -629,15 +567,9 @@ void SDefault_TextPropertyEditableTextBox::OnTextCommitted(const FText& NewText,
 
 void SDefault_TextPropertyEditableTextBox::SetTextError(const FText& InErrorMsg)
 {
-	if (MultiLineWidget.IsValid())
-	{
-		MultiLineWidget->SetErrorMessage(InErrorMsg);
-	}
+	if (MultiLineWidget.IsValid()) { MultiLineWidget->SetErrorMessage(InErrorMsg); }
 
-	if (SingleLineWidget.IsValid())
-	{
-		SingleLineWidget->SetErrorMessage(InErrorMsg);
-	}
+	if (SingleLineWidget.IsValid()) { SingleLineWidget->SetErrorMessage(InErrorMsg); }
 }
 
 FText SDefault_TextPropertyEditableTextBox::GetNamespaceValue() const
@@ -645,19 +577,12 @@ FText SDefault_TextPropertyEditableTextBox::GetNamespaceValue() const
 	FText NamespaceValue;
 
 	const int32 NumTexts = EditableTextProperty->GetNumTexts();
-	if (NumTexts == 1)
-	{
+	if (NumTexts == 1) {
 		const FText PropertyValue = EditableTextProperty->GetText(0);
 		TOptional<FString> FoundNamespace = FTextInspector::GetNamespace(PropertyValue);
-		if (FoundNamespace.IsSet())
-		{
-			NamespaceValue = FText::FromString(TextNamespaceUtil::StripPackageNamespace(FoundNamespace.GetValue()));
-		}
+		if (FoundNamespace.IsSet()) { NamespaceValue = FText::FromString(TextNamespaceUtil::StripPackageNamespace(FoundNamespace.GetValue())); }
 	}
-	else if (NumTexts > 1)
-	{
-		NamespaceValue = MultipleValuesText;
-	}
+	else if (NumTexts > 1) { NamespaceValue = MultipleValuesText; }
 
 	return NamespaceValue;
 }
@@ -673,28 +598,20 @@ void SDefault_TextPropertyEditableTextBox::OnNamespaceChanged(const FText& NewTe
 
 void SDefault_TextPropertyEditableTextBox::OnNamespaceCommitted(const FText& NewText, ETextCommit::Type CommitInfo)
 {
-	if (!IsValidIdentity(NewText))
-	{
-		return;
-	}
+	if (!IsValidIdentity(NewText)) { return; }
 
 	const int32 NumTexts = EditableTextProperty->GetNumTexts();
 
 	// Don't commit the Multiple Values text if there are multiple properties being set
-	if (NumTexts > 0 && (NumTexts == 1 || NewText.ToString() != MultipleValuesText.ToString()))
-	{
+	if (NumTexts > 0 && (NumTexts == 1 || NewText.ToString() != MultipleValuesText.ToString())) {
 		const FString& TextNamespace = NewText.ToString();
-		for (int32 TextIndex = 0; TextIndex < NumTexts; ++TextIndex)
-		{
+		for (int32 TextIndex = 0; TextIndex < NumTexts; ++TextIndex) {
 			const FText PropertyValue = EditableTextProperty->GetText(TextIndex);
 
 			// Only apply the change if the new namespace is different - we want to keep the keys stable where possible
 			const FString CurrentTextNamespace = TextNamespaceUtil::StripPackageNamespace(
 				FTextInspector::GetNamespace(PropertyValue).Get(FString()));
-			if (CurrentTextNamespace.Equals(TextNamespace, ESearchCase::CaseSensitive))
-			{
-				continue;
-			}
+			if (CurrentTextNamespace.Equals(TextNamespace, ESearchCase::CaseSensitive)) { continue; }
 
 			// Get the stable namespace and key that we should use for this property
 			FString NewNamespace;
@@ -738,19 +655,12 @@ FText SDefault_TextPropertyEditableTextBox::GetKeyValue() const
 	FText KeyValue;
 
 	const int32 NumTexts = EditableTextProperty->GetNumTexts();
-	if (NumTexts == 1)
-	{
+	if (NumTexts == 1) {
 		const FText PropertyValue = EditableTextProperty->GetText(0);
 		TOptional<FString> FoundKey = FTextInspector::GetKey(PropertyValue);
-		if (FoundKey.IsSet())
-		{
-			KeyValue = FText::FromString(FoundKey.GetValue());
-		}
+		if (FoundKey.IsSet()) { KeyValue = FText::FromString(FoundKey.GetValue()); }
 	}
-	else if (NumTexts > 1)
-	{
-		KeyValue = MultipleValuesText;
-	}
+	else if (NumTexts > 1) { KeyValue = MultipleValuesText; }
 
 	return KeyValue;
 }
@@ -763,16 +673,11 @@ void SDefault_TextPropertyEditableTextBox::OnKeyChanged(const FText& NewText)
 	const FText ErrorCtx = LOCTEXT("TextKeyErrorCtx", "Key");
 	const bool bIsValidName = IsValidIdentity(NewText, &ErrorMessage, &ErrorCtx);
 
-	if (NewText.IsEmptyOrWhitespace())
-	{
-		ErrorMessage = LOCTEXT("TextKeyEmptyErrorMsg", "Key cannot be empty so a new key will be assigned");
-	}
-	else if (bIsValidName)
-	{
+	if (NewText.IsEmptyOrWhitespace()) { ErrorMessage = LOCTEXT("TextKeyEmptyErrorMsg", "Key cannot be empty so a new key will be assigned"); }
+	else if (bIsValidName) {
 		// Valid name, so check it won't cause an identity conflict (only test if we have a single text selected to avoid confusion)
 		const int32 NumTexts = EditableTextProperty->GetNumTexts();
-		if (NumTexts == 1)
-		{
+		if (NumTexts == 1) {
 			const FText PropertyValue = EditableTextProperty->GetText(0);
 
 			const FString TextNamespace = FTextInspector::GetNamespace(PropertyValue).Get(FString());
@@ -794,8 +699,7 @@ void SDefault_TextPropertyEditableTextBox::OnKeyChanged(const FText& NewText)
 			);
 
 			if (TextNamespace.Equals(NewNamespace, ESearchCase::CaseSensitive) && !TextKey.Equals(
-				NewKey, ESearchCase::CaseSensitive))
-			{
+				NewKey, ESearchCase::CaseSensitive)) {
 				ErrorMessage = LOCTEXT("TextKeyConflictErrorMsg",
 				                       "Identity (namespace & key) is being used by a different text within this package so a new key will be assigned");
 			}
@@ -807,27 +711,19 @@ void SDefault_TextPropertyEditableTextBox::OnKeyChanged(const FText& NewText)
 
 void SDefault_TextPropertyEditableTextBox::OnKeyCommitted(const FText& NewText, ETextCommit::Type CommitInfo)
 {
-	if (!IsValidIdentity(NewText))
-	{
-		return;
-	}
+	if (!IsValidIdentity(NewText)) { return; }
 
 	const int32 NumTexts = EditableTextProperty->GetNumTexts();
 
 	// Don't commit the Multiple Values text if there are multiple properties being set
-	if (NumTexts > 0 && (NumTexts == 1 || NewText.ToString() != MultipleValuesText.ToString()))
-	{
+	if (NumTexts > 0 && (NumTexts == 1 || NewText.ToString() != MultipleValuesText.ToString())) {
 		const FString& TextKey = NewText.ToString();
-		for (int32 TextIndex = 0; TextIndex < NumTexts; ++TextIndex)
-		{
+		for (int32 TextIndex = 0; TextIndex < NumTexts; ++TextIndex) {
 			const FText PropertyValue = EditableTextProperty->GetText(TextIndex);
 
 			// Only apply the change if the new key is different - we want to keep the keys stable where possible
 			const FString CurrentTextKey = FTextInspector::GetKey(PropertyValue).Get(FString());
-			if (CurrentTextKey.Equals(TextKey, ESearchCase::CaseSensitive))
-			{
-				continue;
-			}
+			if (CurrentTextKey.Equals(TextKey, ESearchCase::CaseSensitive)) { continue; }
 
 			// Get the stable namespace and key that we should use for this property
 			FString NewNamespace;
@@ -853,19 +749,12 @@ FText SDefault_TextPropertyEditableTextBox::GetPackageValue() const
 	FText PackageValue;
 
 	const int32 NumTexts = EditableTextProperty->GetNumTexts();
-	if (NumTexts == 1)
-	{
+	if (NumTexts == 1) {
 		const FText PropertyValue = EditableTextProperty->GetText(0);
 		TOptional<FString> FoundNamespace = FTextInspector::GetNamespace(PropertyValue);
-		if (FoundNamespace.IsSet())
-		{
-			PackageValue = FText::FromString(TextNamespaceUtil::ExtractPackageNamespace(FoundNamespace.GetValue()));
-		}
+		if (FoundNamespace.IsSet()) { PackageValue = FText::FromString(TextNamespaceUtil::ExtractPackageNamespace(FoundNamespace.GetValue())); }
 	}
-	else if (NumTexts > 1)
-	{
-		PackageValue = MultipleValuesText;
-	}
+	else if (NumTexts > 1) { PackageValue = MultipleValuesText; }
 
 	return PackageValue;
 }
@@ -875,8 +764,7 @@ FText SDefault_TextPropertyEditableTextBox::GetPackageValue() const
 ECheckBoxState SDefault_TextPropertyEditableTextBox::GetLocalizableCheckState() const
 {
 	const int32 NumTexts = EditableTextProperty->GetNumTexts();
-	if (NumTexts == 1)
-	{
+	if (NumTexts == 1) {
 		const FText PropertyValue = EditableTextProperty->GetText(0);
 
 		const bool bIsLocalized = !PropertyValue.IsCultureInvariant();
@@ -890,15 +778,12 @@ void SDefault_TextPropertyEditableTextBox::HandleLocalizableCheckStateChanged(EC
 {
 	const int32 NumTexts = EditableTextProperty->GetNumTexts();
 
-	if (InCheckboxState == ECheckBoxState::Checked)
-	{
-		for (int32 TextIndex = 0; TextIndex < NumTexts; ++TextIndex)
-		{
+	if (InCheckboxState == ECheckBoxState::Checked) {
+		for (int32 TextIndex = 0; TextIndex < NumTexts; ++TextIndex) {
 			const FText PropertyValue = EditableTextProperty->GetText(TextIndex);
 
 			// Assign a key to any currently culture invariant texts
-			if (PropertyValue.IsCultureInvariant())
-			{
+			if (PropertyValue.IsCultureInvariant()) {
 				// Get the stable namespace and key that we should use for this property
 				FString NewNamespace;
 				FString NewKey;
@@ -913,20 +798,16 @@ void SDefault_TextPropertyEditableTextBox::HandleLocalizableCheckStateChanged(EC
 				);
 
 				EditableTextProperty->SetText(
-					TextIndex, FInternationalization::Get().ForUseOnlyByLocMacroAndGraphNodeTextLiterals_CreateText(
-						*PropertyValue.ToString(), *NewNamespace, *NewKey));
+					TextIndex, FText::AsLocalizable_Advanced(*NewNamespace, *NewKey, *PropertyValue.ToString()));
 			}
 		}
 	}
-	else
-	{
-		for (int32 TextIndex = 0; TextIndex < NumTexts; ++TextIndex)
-		{
+	else {
+		for (int32 TextIndex = 0; TextIndex < NumTexts; ++TextIndex) {
 			const FText PropertyValue = EditableTextProperty->GetText(TextIndex);
 
 			// Clear the identity from any non-culture invariant texts
-			if (!PropertyValue.IsCultureInvariant())
-			{
+			if (!PropertyValue.IsCultureInvariant()) {
 				const FString* TextSource = FTextInspector::GetSourceString(PropertyValue);
 				EditableTextProperty->SetText(TextIndex, FText::AsCultureInvariant(PropertyValue.ToString()));
 			}
@@ -936,27 +817,15 @@ void SDefault_TextPropertyEditableTextBox::HandleLocalizableCheckStateChanged(EC
 
 FText SDefault_TextPropertyEditableTextBox::GetAdvancedTextSettingsComboToolTip() const
 {
-	if (IsTextLocalizable())
-	{
-		return LOCTEXT("AdvancedTextSettingsComboToolTip", "Edit advanced text settings.");
-	}
-	else
-	{
-		return LOCTEXT("TextNotLocalizedWarningToolTip",
-		               "This text is marked as 'culture invariant' and won't be gathered for localization.\nYou can change this by editing the advanced text settings.");
-	}
+	if (IsTextLocalizable()) { return LOCTEXT("AdvancedTextSettingsComboToolTip", "Edit advanced text settings."); }
+	return LOCTEXT("TextNotLocalizedWarningToolTip",
+	               "This text is marked as 'culture invariant' and won't be gathered for localization.\nYou can change this by editing the advanced text settings.");
 }
 
 const FSlateBrush* SDefault_TextPropertyEditableTextBox::GetAdvancedTextSettingsComboImage() const
 {
-	if (IsTextLocalizable())
-	{
-		return FAppStyle::GetBrush("Icons.Restyle.LocalizationDashboard.MenuIcon");
-	}
-	else
-	{
-		return FCoreStyle::Get().GetBrush("Icons.Warning");
-	}
+	if (IsTextLocalizable()) { return FAppStyle::GetBrush("Icons.Restyle.LocalizationDashboard.MenuIcon"); }
+	return FCoreStyle::Get().GetBrush("Icons.Warning");
 }
 
 bool SDefault_TextPropertyEditableTextBox::IsValidIdentity(const FText& InIdentity, FText* OutReason,

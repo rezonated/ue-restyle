@@ -21,7 +21,7 @@ public:
 		SLATE_EVENT(FOnNumericValueCommitted, OnNumericCommitted_Box_2)
 	SLATE_END_ARGS()
 
-		//Construct editable text boxes with the appropriate getter & setter functions along with tool tip text
+	//Construct editable text boxes with the appropriate getter & setter functions along with tool tip text
 	void Construct(const FArguments& InArgs, const bool bInIsRotator)
 	{
 		const auto& Vector = UPinRestyleSettings::Get()->Inputs.Vector;
@@ -128,40 +128,22 @@ public:
 	}
 
 private:
-
 	NumericType GetValueType(const FString& InString) const
 	{
 		static_assert(std::is_floating_point_v<NumericType>);
 
-		if constexpr (std::is_same_v<float, NumericType>)
-		{
-			return FCString::Atof(*InString);
-		}
-		else if constexpr (std::is_same_v<double, NumericType>)
-		{
-			return FCString::Atod(*InString);
-		}
-
-		return NumericType{};
+		if constexpr (std::is_same_v<float, NumericType>) { return FCString::Atof(*InString); }
+		else if constexpr (std::is_same_v<double, NumericType>) { return FCString::Atod(*InString); }
 	}
 
 	// Get value for text box 0
-	TOptional<NumericType> GetTypeInValue_0() const
-	{
-		return GetValueType(VisibleText_0.Get());
-	}
+	TOptional<NumericType> GetTypeInValue_0() const { return GetValueType(VisibleText_0.Get()); }
 
 	// Get value for text box 1
-	TOptional<NumericType> GetTypeInValue_1() const
-	{
-		return GetValueType(VisibleText_1.Get());
-	}
+	TOptional<NumericType> GetTypeInValue_1() const { return GetValueType(VisibleText_1.Get()); }
 
 	// Get value for text box 2
-	TOptional<NumericType> GetTypeInValue_2() const
-	{
-		return GetValueType(VisibleText_2.Get());
-	}
+	TOptional<NumericType> GetTypeInValue_2() const { return GetValueType(VisibleText_2.Get()); }
 
 	TAttribute<FString> VisibleText_0;
 	TAttribute<FString> VisibleText_1;
@@ -170,4 +152,4 @@ private:
 	bool bIsRotator;
 };
 
-#undef LOCTEXT_NAMESPACE 
+#undef LOCTEXT_NAMESPACE

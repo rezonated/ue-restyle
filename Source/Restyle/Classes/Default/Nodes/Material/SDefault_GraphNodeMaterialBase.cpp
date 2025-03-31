@@ -23,13 +23,13 @@
 
 #include "Themes/Default/NodeRestyleDefault.h"
 
+#include "Default/Widgets/SDefault_CheckBox.h"
 #include "Widgets/SBoxPanel.h"
 #include "Widgets/SViewport.h"
 #include "Widgets/Images/SImage.h"
 #include "Widgets/Input/SCheckBox.h"
 #include "Widgets/Layout/SBox.h"
 #include "Widgets/Text/SInlineEditableTextBlock.h"
-#include "Default/Widgets/SDefault_CheckBox.h"
 /**
 * Simple representation of the backbuffer that the preview canvas renders to
 * This class may only be accessed from the render thread
@@ -41,46 +41,25 @@ class FSlateMaterialPreviewRenderTarget : public FRenderTarget
 {
 public:
 	/** FRenderTarget interface */
-	virtual FIntPoint GetSizeXY() const
-	{
-		return ClippingRect.Size();
-	}
+	virtual FIntPoint GetSizeXY() const override { return ClippingRect.Size(); }
 
 	/** Sets the texture that this target renders to */
-	void SetRenderTargetTexture(FTexture2DRHIRef& InRHIRef)
-	{
-		RenderTargetTextureRHI = InRHIRef;
-	}
+	void SetRenderTargetTexture(FTextureRHIRef& InRHIRef) { RenderTargetTextureRHI = InRHIRef; }
 
 	/** Clears the render target texture */
-	void ClearRenderTargetTexture()
-	{
-		RenderTargetTextureRHI.SafeRelease();
-	}
+	void ClearRenderTargetTexture() { RenderTargetTextureRHI.SafeRelease(); }
 
 	/** Sets the viewport rect for the render target */
-	void SetViewRect(const FIntRect& InViewRect)
-	{
-		ViewRect = InViewRect;
-	}
+	void SetViewRect(const FIntRect& InViewRect) { ViewRect = InViewRect; }
 
 	/** Gets the viewport rect for the render target */
-	const FIntRect& GetViewRect() const
-	{
-		return ViewRect;
-	}
+	const FIntRect& GetViewRect() const { return ViewRect; }
 
 	/** Sets the clipping rect for the render target */
-	void SetClippingRect(const FIntRect& InClippingRect)
-	{
-		ClippingRect = InClippingRect;
-	}
+	void SetClippingRect(const FIntRect& InClippingRect) { ClippingRect = InClippingRect; }
 
 	/** Gets the clipping rect for the render target */
-	const FIntRect& GetClippingRect() const
-	{
-		return ClippingRect;
-	}
+	const FIntRect& GetClippingRect() const { return ClippingRect; }
 
 private:
 	FIntRect ViewRect;
@@ -93,30 +72,23 @@ private:
 
 FRestylePreviewViewport::FRestylePreviewViewport(class UMaterialGraphNode* InNode)
 	: MaterialNode(InNode)
-	, PreviewElement(new FRestylePreviewElement)
+	  , PreviewElement(new FRestylePreviewElement)
 {
-	if (MaterialNode)
-	{
-		MaterialNode->InvalidatePreviewMaterialDelegate.BindRaw(this, &FRestylePreviewViewport::UpdatePreviewNodeRenderProxy);
-	}
+	if (MaterialNode) { MaterialNode->InvalidatePreviewMaterialDelegate.BindRaw(this, &FRestylePreviewViewport::UpdatePreviewNodeRenderProxy); }
 }
 
 FRestylePreviewViewport::~FRestylePreviewViewport()
 {
-	if (MaterialNode)
-	{
-		MaterialNode->InvalidatePreviewMaterialDelegate.Unbind();
-	}
+	if (MaterialNode) { MaterialNode->InvalidatePreviewMaterialDelegate.Unbind(); }
 	// Pass the preview element to the render thread so that it's deleted after it's shown for the last time
 	ENQUEUE_RENDER_COMMAND(SafeDeletePreviewElement)(
-		[PreviewElement = PreviewElement](FRHICommandListImmediate& RHICmdList) mutable
-		{
-			PreviewElement.Reset();
-		}
+		[PreviewElement = PreviewElement](FRHICommandListImmediate& RHICmdList) mutable { PreviewElement.Reset(); }
 	);
 }
 
-void FRestylePreviewViewport::OnDrawViewport(const FGeometry& AllottedGeometry, const FSlateRect& MyCullingRect, class FSlateWindowElementList& OutDrawElements, int32 LayerId, const FWidgetStyle& InWidgetStyle, bool bParentEnabled)
+void FRestylePreviewViewport::OnDrawViewport(const FGeometry& AllottedGeometry, const FSlateRect& MyCullingRect,
+                                             class FSlateWindowElementList& OutDrawElements, int32 LayerId, const FWidgetStyle& InWidgetStyle,
+                                             bool bParentEnabled)
 {
 	FSlateRect SlateCanvasRect = AllottedGeometry.GetLayoutBoundingRect();
 	FSlateRect ClippedCanvasRect = SlateCanvasRect.IntersectionWith(MyCullingRect);
@@ -135,25 +107,18 @@ void FRestylePreviewViewport::OnDrawViewport(const FGeometry& AllottedGeometry, 
 
 	bool bIsRealtime = MaterialNode->RealtimeDelegate.IsBound() ? MaterialNode->RealtimeDelegate.Execute() : false;
 
-	if (PreviewElement->BeginRenderingCanvas(CanvasRect, ClippingRect, MaterialNode, bIsRealtime))
-	{
+	if (PreviewElement->BeginRenderingCanvas(CanvasRect, ClippingRect, MaterialNode, bIsRealtime)) {
 		// Draw above everything else
 		uint32 PreviewLayer = LayerId + 1;
 		FSlateDrawElement::MakeCustom(OutDrawElements, PreviewLayer, PreviewElement);
 	}
 }
 
-FIntPoint FRestylePreviewViewport::GetSize() const
-{
-	return FIntPoint(96, 96);
-}
+FIntPoint FRestylePreviewViewport::GetSize() const { return FIntPoint(96, 96); }
 
 void FRestylePreviewViewport::UpdatePreviewNodeRenderProxy()
 {
-	if (PreviewElement.IsValid())
-	{
-		PreviewElement->UpdateExpressionPreview(MaterialNode);
-	}
+	if (PreviewElement.IsValid()) { PreviewElement->UpdateExpressionPreview(MaterialNode); }
 }
 
 /////////////////////////////////////////////////////
@@ -161,20 +126,16 @@ void FRestylePreviewViewport::UpdatePreviewNodeRenderProxy()
 
 FRestylePreviewElement::FRestylePreviewElement()
 	: RenderTarget(new FSlateMaterialPreviewRenderTarget)
-	, ExpressionPreview(nullptr)
-	, bIsRealtime(false)
-{
-}
+	  , ExpressionPreview(nullptr)
+	  , bIsRealtime(false) {}
 
-FRestylePreviewElement::~FRestylePreviewElement()
-{
-	delete RenderTarget;
-}
+FRestylePreviewElement::~FRestylePreviewElement() { delete RenderTarget; }
 
-bool FRestylePreviewElement::BeginRenderingCanvas(const FIntRect& InCanvasRect, const FIntRect& InClippingRect, UMaterialGraphNode* InGraphNode, bool bInIsRealtime)
+bool FRestylePreviewElement::BeginRenderingCanvas(const FIntRect& InCanvasRect, const FIntRect& InClippingRect, UMaterialGraphNode* InGraphNode,
+                                                  bool bInIsRealtime)
 {
-	if (InCanvasRect.Size().X > 0 && InCanvasRect.Size().Y > 0 && InClippingRect.Size().X > 0 && InClippingRect.Size().Y > 0 && InGraphNode != NULL)
-	{
+	if (InCanvasRect.Size().X > 0 && InCanvasRect.Size().Y > 0 && InClippingRect.Size().X > 0 && InClippingRect.Size().Y > 0 && InGraphNode !=
+		nullptr) {
 		/**
 		 * Struct to contain all info that needs to be passed to the render thread
 		 */
@@ -201,9 +162,9 @@ bool FRestylePreviewElement::BeginRenderingCanvas(const FIntRect& InCanvasRect, 
 			[PreviewElement, RenderInfo](FRHICommandListImmediate& RHICmdList)
 			{
 				PreviewElement->RenderTarget->SetViewRect(RenderInfo.CanvasRect);
-		PreviewElement->RenderTarget->SetClippingRect(RenderInfo.ClippingRect);
-		PreviewElement->ExpressionPreview = RenderInfo.RenderProxy;
-		PreviewElement->bIsRealtime = RenderInfo.bIsRealtime;
+				PreviewElement->RenderTarget->SetClippingRect(RenderInfo.ClippingRect);
+				PreviewElement->ExpressionPreview = RenderInfo.RenderProxy;
+				PreviewElement->bIsRealtime = RenderInfo.bIsRealtime;
 			}
 		);
 		return true;
@@ -217,24 +178,20 @@ void FRestylePreviewElement::UpdateExpressionPreview(UMaterialGraphNode* Materia
 	FRestylePreviewElement* PreviewElement = this;
 	FMaterialRenderProxy* InRenderProxy = MaterialNode ? MaterialNode->GetExpressionPreview() : nullptr;
 	ENQUEUE_RENDER_COMMAND(UpdatePreviewNodeRenderProxy)(
-		[PreviewElement, InRenderProxy](FRHICommandListImmediate& RHICmdList)
-		{
-			PreviewElement->ExpressionPreview = InRenderProxy;
-		}
+		[PreviewElement, InRenderProxy](FRHICommandListImmediate& RHICmdList) { PreviewElement->ExpressionPreview = InRenderProxy; }
 	);
 }
 
 void FRestylePreviewElement::DrawRenderThread(FRHICommandListImmediate& RHICmdList, const void* InWindowBackBuffer)
 {
-	if (ExpressionPreview)
-	{
-		RenderTarget->SetRenderTargetTexture(*(FTexture2DRHIRef*)InWindowBackBuffer);
+	if (ExpressionPreview) {
+		RenderTarget->SetRenderTargetTexture(*(FTextureRHIRef*)InWindowBackBuffer);
 		{
 			// Check realtime mode for whether to pass current time to canvas
 			float CurrentTime = bIsRealtime ? (FApp::GetCurrentTime() - GStartTime) : 0.0f;
 			float DeltaTime = bIsRealtime ? FApp::GetDeltaTime() : 0.0f;
 
-			FCanvas Canvas(RenderTarget, NULL, FGameTime::CreateUndilated(CurrentTime, DeltaTime), GMaxRHIFeatureLevel);
+			FCanvas Canvas(RenderTarget, nullptr, FGameTime::CreateUndilated(CurrentTime, DeltaTime), GMaxRHIFeatureLevel);
 			{
 				Canvas.SetAllowedModes(0);
 				Canvas.SetRenderTargetRect(RenderTarget->GetViewRect());
@@ -270,14 +227,12 @@ void SDefault_GraphNodeMaterialBase::Construct(const FArguments& InArgs, UMateri
 void SDefault_GraphNodeMaterialBase::CreatePinWidgets()
 {
 	// Create Pin widgets for each of the pins.
-	for (int32 PinIndex = 0; PinIndex < GraphNode->Pins.Num(); ++PinIndex)
-	{
+	for (int32 PinIndex = 0; PinIndex < GraphNode->Pins.Num(); ++PinIndex) {
 		UEdGraphPin* CurPin = GraphNode->Pins[PinIndex];
 
 		bool bHideNoConnectionPins = false;
 
-		if (OwnerGraphPanelPtr.IsValid())
-		{
+		if (OwnerGraphPanelPtr.IsValid()) {
 			bHideNoConnectionPins = OwnerGraphPanelPtr.Pin()->GetPinVisibility() == SGraphEditor::Pin_HideNoConnection;
 		}
 
@@ -286,27 +241,23 @@ void SDefault_GraphNodeMaterialBase::CreatePinWidgets()
 		bool bPinDesiresToBeHidden = CurPin->bHidden || (bHideNoConnectionPins && !bPinHasConections);
 
 		UMaterialGraph* MaterialGraph = CastChecked<UMaterialGraph>(GraphNode->GetGraph());
-		if (MaterialNode && MaterialNode->MaterialExpression && MaterialGraph->MaterialFunction == nullptr && !MaterialGraph->MaterialInputs.IsEmpty())
-		{
+		if (MaterialNode && MaterialNode->MaterialExpression && MaterialGraph->MaterialFunction == nullptr && !MaterialGraph->MaterialInputs.
+			IsEmpty()) {
 			bool bIsAMakeAttrNode = MaterialNode->MaterialExpression->IsA(UMaterialExpressionMakeMaterialAttributes::StaticClass());
 			bool bIsABreakAttrNode = MaterialNode->MaterialExpression->IsA(UMaterialExpressionBreakMaterialAttributes::StaticClass());
 
-			if ((bIsABreakAttrNode && CurPin->Direction == EGPD_Output) || (bIsAMakeAttrNode && CurPin->Direction == EGPD_Input))
-			{
-				if (CurPin->PinType.PinCategory != UMaterialGraphSchema::PC_Exec)
-				{
+			if ((bIsABreakAttrNode && CurPin->Direction == EGPD_Output) || (bIsAMakeAttrNode && CurPin->Direction == EGPD_Input)) {
+				if (CurPin->PinType.PinCategory != UMaterialGraphSchema::PC_Exec) {
 					bPinDesiresToBeHidden |= !MaterialGraph->MaterialInputs[CurPin->SourceIndex].IsVisiblePin(MaterialGraph->Material, true);
 				}
 			}
 		}
 
-		if (!bPinDesiresToBeHidden)
-		{
+		if (!bPinDesiresToBeHidden) {
 			TSharedPtr<SGraphPin> NewPin = CreatePinWidget(CurPin);
 			check(NewPin.IsValid());
 			// Assign an custom icon to not connectible pins
-			if (CurPin->bNotConnectable)
-			{
+			if (CurPin->bNotConnectable) {
 				/*if (!CacheImg_Pin_NotConnectable)
 				{
 					CacheImg_Pin_NotConnectable = FAppStyle::GetBrush(NAME_Pin_NotConnectable);
@@ -335,25 +286,21 @@ void SDefault_GraphNodeMaterialBase::AddPin(const TSharedRef<SGraphPin>& PinToAd
 	// Set visibility on advanced view pins
 	const UEdGraphPin* PinObj = PinToAdd->GetPinObj();
 	const bool bAdvancedParameter = (PinObj != nullptr) && PinObj->bAdvancedView;
-	if (bAdvancedParameter)
-	{
-		PinToAdd->SetVisibility(TAttribute<EVisibility>(PinToAdd, &SGraphPin::IsPinVisibleAsAdvanced));
-	}
+	if (bAdvancedParameter) { PinToAdd->SetVisibility(TAttribute<EVisibility>(PinToAdd, &SGraphPin::IsPinVisibleAsAdvanced)); }
 
-	if (PinToAdd->GetDirection() == EEdGraphPinDirection::EGPD_Input)
-	{
+	if (PinToAdd->GetDirection() == EGPD_Input) {
 		FMargin Padding = Settings->GetInputPinPadding();
 		Padding.Left *= 0.5f;
 		Padding.Right = 0.0f;
 
 		LeftNodeBox->AddSlot()
-			.AutoHeight()
-			.HAlign(HAlign_Left)
-			.VAlign(VAlign_Center)
-			.Padding(Padding)
-			[
-				PinToAdd
-			];
+		           .AutoHeight()
+		           .HAlign(HAlign_Left)
+		           .VAlign(VAlign_Center)
+		           .Padding(Padding)
+		[
+			PinToAdd
+		];
 		InputPins.Add(PinToAdd);
 	}
 	else // Direction == EEdGraphPinDirection::EGPD_Output
@@ -363,87 +310,74 @@ void SDefault_GraphNodeMaterialBase::AddPin(const TSharedRef<SGraphPin>& PinToAd
 		Padding.Right *= 0.5f;
 
 		RightNodeBox->AddSlot()
-			.AutoHeight()
-			.HAlign(HAlign_Right)
-			.VAlign(VAlign_Center)
-			.Padding(Padding)
-			[
-				PinToAdd
-			];
+		            .AutoHeight()
+		            .HAlign(HAlign_Right)
+		            .VAlign(VAlign_Center)
+		            .Padding(Padding)
+		[
+			PinToAdd
+		];
 		OutputPins.Add(PinToAdd);
 	}
 }
 
 void SDefault_GraphNodeMaterialBase::CreateBelowPinControls(TSharedPtr<SVerticalBox> MainBox)
 {
-	if (GraphNode && MainBox.IsValid())
-	{
+	if (GraphNode && MainBox.IsValid()) {
 		// Count the number of visible input pins on the left
 		int32 LeftPinCount = 0;
-		if (GraphNode->AdvancedPinDisplay == ENodeAdvancedPins::Hidden)
-		{
+		if (GraphNode->AdvancedPinDisplay == ENodeAdvancedPins::Hidden) {
 			// Advanced view pins are hidden so exclude them from the pin count
-			for (int32 i = 0; i < InputPins.Num(); ++i)
-			{
+			for (int32 i = 0; i < InputPins.Num(); ++i) {
 				const UEdGraphPin* PinObj = InputPins[i]->GetPinObj();
-				if (!PinObj->bAdvancedView)
-				{
-					LeftPinCount++;
-				}
+				if (!PinObj->bAdvancedView) { LeftPinCount++; }
 			}
 		}
-		else
-		{
-			LeftPinCount = InputPins.Num();
-		}
+		else { LeftPinCount = InputPins.Num(); }
 
 		int32 RightPinCount = OutputPins.Num();
 
 		const float NegativeHPad = FMath::Max<float>(-Settings->PaddingTowardsNodeEdge, 0.0f);
-		const float ExtraPad = 0.0f;
+		constexpr float ExtraPad = 0.0f;
 
 		// Place preview widget based on where the least pins are
-		if ((LeftPinCount < RightPinCount) || (RightPinCount == 0))
-		{
+		if ((LeftPinCount < RightPinCount) || (RightPinCount == 0)) {
 			LeftNodeBox->AddSlot()
-				.Padding(FMargin(NegativeHPad + ExtraPad, 0.0f, 0.0f, 0.0f))
-				.AutoHeight()
-				.HAlign(HAlign_Left)
-				[
-					CreatePreviewWidget()
-				];
+			           .Padding(FMargin(NegativeHPad + ExtraPad, 0.0f, 0.0f, 0.0f))
+			           .AutoHeight()
+			           .HAlign(HAlign_Left)
+			[
+				CreatePreviewWidget()
+			];
 		}
-		else if (LeftPinCount > RightPinCount)
-		{
+		else if (LeftPinCount > RightPinCount) {
 			RightNodeBox->AddSlot()
-				.Padding(FMargin(NegativeHPad + ExtraPad, 0.0f, 0.0f, 0.0f))
-				.AutoHeight()
-				.HAlign(HAlign_Right)
-				[
-					CreatePreviewWidget()
-				];
+			            .Padding(FMargin(NegativeHPad + ExtraPad, 0.0f, 0.0f, 0.0f))
+			            .AutoHeight()
+			            .HAlign(HAlign_Right)
+			[
+				CreatePreviewWidget()
+			];
 		}
-		else
-		{
+		else {
 			MainBox->AddSlot()
-				.Padding(Settings->GetNonPinNodeBodyPadding())
-				.AutoHeight()
-				[
-					SNew(SHorizontalBox)
-					+ SHorizontalBox::Slot()
+			       .Padding(Settings->GetNonPinNodeBodyPadding())
+			       .AutoHeight()
+			[
+				SNew(SHorizontalBox)
+				+ SHorizontalBox::Slot()
 				.AutoWidth()
 				[
 					CreatePreviewWidget()
 				]
-				];
+			];
 		}
 	}
 }
 
 void SDefault_GraphNodeMaterialBase::SetDefaultTitleAreaWidget(TSharedRef<SOverlay> DefaultTitleAreaWidget)
 {
-	if (!MaterialNode->MaterialExpression->bHidePreviewWindow)
-	{
+	if (!MaterialNode->MaterialExpression->bHidePreviewWindow) {
 		/*DefaultTitleAreaWidget->AddSlot()
 			.HAlign(HAlign_Right)
 			.VAlign(VAlign_Center)
@@ -499,10 +433,9 @@ TSharedRef<SWidget> SDefault_GraphNodeMaterialBase::CreatePreviewWidget()
 	PreviewViewport.Reset();
 
 	// if this node should currently show a preview
-	if (!MaterialNode->MaterialExpression->bHidePreviewWindow && !MaterialNode->MaterialExpression->bCollapsed)
-	{
-		const float ExpressionPreviewSize = 106.0f;
-		const float CentralPadding = 5.0f;
+	if (!MaterialNode->MaterialExpression->bHidePreviewWindow && !MaterialNode->MaterialExpression->bCollapsed) {
+		constexpr float ExpressionPreviewSize = 106.0f;
+		constexpr float CentralPadding = 5.0f;
 
 		TSharedPtr<SViewport> ViewportWidget =
 			SNew(SViewport)
@@ -562,8 +495,7 @@ void SDefault_GraphNodeMaterialBase::OnExpressionPreviewChanged(const ECheckBoxS
 {
 	UMaterialExpression* MaterialExpression = MaterialNode->MaterialExpression;
 	const bool bCollapsed = (NewCheckedState != ECheckBoxState::Checked);
-	if (MaterialExpression->bCollapsed != bCollapsed)
-	{
+	if (MaterialExpression->bCollapsed != bCollapsed) {
 		UMaterialGraph* MaterialGraph = CastChecked<UMaterialGraph>(MaterialNode->GetGraph());
 		MaterialGraph->ToggleCollapsedDelegate.ExecuteIfBound(MaterialExpression);
 
@@ -581,41 +513,39 @@ const FSlateBrush* SDefault_GraphNodeMaterialBase::GetExpressionPreviewArrow() c
 {
 	return FAppStyle::GetBrush(MaterialNode->MaterialExpression->bCollapsed ? TEXT("Icons.ChevronDown") : TEXT("Icons.ChevronUp"));
 }
- 
+
 void SDefault_GraphNodeMaterialBase::UpdateGraphNode()
 {
 	SDefault_GraphNodeRestyleBase::UpdateGraphNode();
 	auto Style = UNodeRestyleSettings::Get();
 	const auto& Node = Style->Node;
 	const auto& Material = Style->OtherNodes.Material;
-	if (IsPreviewCheckboxNeeded() && TitleContent.IsValid())
-	{
+	if (IsPreviewCheckboxNeeded() && TitleContent.IsValid()) {
 		auto PreviewCheckbox = CreatePreviewCheckbox();
 		float CheckboxSpacing = UDefaultThemeSettings::GetSpacing(Material.PreviewCheckboxSpacing);
 		TitleContent->AddSlot()
-			.HAlign(HAlign_Right)
-			.VAlign(VAlign_Center)
-			.AutoWidth()
-			.Padding(CheckboxSpacing, 0, 0, 0)
+		            .HAlign(HAlign_Right)
+		            .VAlign(VAlign_Center)
+		            .AutoWidth()
+		            .Padding(CheckboxSpacing, 0, 0, 0)
 
-			[
-				PreviewCheckbox.ToSharedRef()
-			];
+		[
+			PreviewCheckbox.ToSharedRef()
+		];
 	}
 }
- 
+
 void SDefault_GraphNodeMaterialBase::PopulateMetaTag(FGraphNodeMetaData* TagMeta) const
 {
-	if (GraphNode != nullptr)
-	{
+	if (GraphNode != nullptr) {
 		UMaterialGraph* OuterGraph = MaterialNode->GetTypedOuter<UMaterialGraph>();
-		if ((OuterGraph != nullptr) && (MaterialNode->MaterialExpression != nullptr))
-		{
+		if ((OuterGraph != nullptr) && (MaterialNode->MaterialExpression != nullptr)) {
 			TagMeta->OuterName = OuterGraph->OriginalMaterialFullName;
 			TagMeta->GUID = MaterialNode->MaterialExpression->MaterialExpressionGuid;
 			TagMeta->Tag = FName(*FString::Printf(TEXT("MaterialExprNode_%s_%s"), *TagMeta->OuterName, *TagMeta->GUID.ToString()));
 		}
-		TagMeta->FriendlyName = FString::Printf(TEXT("%s expression node in %s"), *GraphNode->GetNodeTitle(ENodeTitleType::FullTitle).ToString(), *TagMeta->OuterName);
+		TagMeta->FriendlyName = FString::Printf(TEXT("%s expression node in %s"), *GraphNode->GetNodeTitle(ENodeTitleType::FullTitle).ToString(),
+		                                        *TagMeta->OuterName);
 	}
 }
 
@@ -636,10 +566,7 @@ TSharedPtr<SCheckBox> SDefault_GraphNodeMaterialBase::CreatePreviewCheckbox()
 		.Style(FAppStyle::Get(), FNodeRestyleStyles::MaterialNode_PreviewCheckbox);
 }
 
-bool SDefault_GraphNodeMaterialBase::IsPreviewCheckboxNeeded() const
-{
-	return !MaterialNode->MaterialExpression->bHidePreviewWindow;
-}
+bool SDefault_GraphNodeMaterialBase::IsPreviewCheckboxNeeded() const { return !MaterialNode->MaterialExpression->bHidePreviewWindow; }
 
 TSharedPtr<SVerticalBox> SDefault_GraphNodeMaterialBase::MakeInnerVerticalBox(
 	TSharedRef<SOverlay> DefaultTitleAreaWidget)
@@ -650,18 +577,18 @@ TSharedPtr<SVerticalBox> SDefault_GraphNodeMaterialBase::MakeInnerVerticalBox(
 	TSharedPtr<SVerticalBox> InnerVerticalBox =
 		SNew(SVerticalBox)
 		+ SVerticalBox::Slot()
-		  .AutoHeight()
-		  .HAlign(HAlign_Fill)
-		  .VAlign(VAlign_Top)
-		  .Padding(0)
+		.AutoHeight()
+		.HAlign(HAlign_Fill)
+		.VAlign(VAlign_Top)
+		.Padding(0)
 		[
 			DefaultTitleAreaWidget
 		]
 		+ SVerticalBox::Slot()
-		  .AutoHeight()
-		  .HAlign(HAlign_Fill)
-		  .VAlign(VAlign_Top)
-		  .Padding(0)
+		.AutoHeight()
+		.HAlign(HAlign_Fill)
+		.VAlign(VAlign_Top)
+		.Padding(0)
 		[
 			SNew(SBorder)
 			.BorderImage(FAppStyle::GetBrush("NoBorder"))
@@ -674,22 +601,22 @@ TSharedPtr<SVerticalBox> SDefault_GraphNodeMaterialBase::MakeInnerVerticalBox(
 				 */
 				SNew(SHorizontalBox)
 				+ SHorizontalBox::Slot()
-				  .HAlign(HAlign_Left)
-				  .FillWidth(1.0f)
-				  .Padding(FMargin(Settings->PaddingTowardsNodeEdge / 2, 0, 0, 0))
+				.HAlign(HAlign_Left)
+				.FillWidth(1.0f)
+				.Padding(FMargin(Settings->PaddingTowardsNodeEdge / 2, 0, 0, 0))
 				[
 					// LEFT
 					SAssignNew(LeftNodeBox, SVerticalBox)
 				]
 				+ SHorizontalBox::Slot()
-				  .AutoWidth()
-				  .HAlign(HAlign_Right)
-				  .Padding(ContentSpacing, 0, Settings->PaddingTowardsNodeEdge / 2, 0)
+				.AutoWidth()
+				.HAlign(HAlign_Right)
+				.Padding(ContentSpacing, 0, Settings->PaddingTowardsNodeEdge / 2, 0)
 				[
 					// RIGHT
 					SAssignNew(RightNodeBox, SVerticalBox)
 				]
 			]
 		];
-		return InnerVerticalBox;
+	return InnerVerticalBox;
 }

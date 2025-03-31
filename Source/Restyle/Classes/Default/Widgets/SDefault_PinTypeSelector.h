@@ -7,22 +7,19 @@
 class SDefault_PinTypeSelector : public SPinTypeSelector
 {
 	SLATE_BEGIN_ARGS(SDefault_PinTypeSelector)
-		: _TargetPinType()
-		, _Schema(nullptr)
-		, _SchemaAction(nullptr)
-		, _TypeTreeFilter(ETypeTreeFilter::None)
-		, _bAllowArrays(true)
-		, _TreeViewWidth(300.f)
-		, _TreeViewHeight(400.f)
-		, _Font(FAppStyle::GetFontStyle(TEXT("NormalFont")))
-		, _SelectorType(ESelectorType::Full)
-		, _TypeComboButtonStyle(nullptr)
-		, _TypeComboButtonPadding(FMargin(0))
-		, _TypeComboButtonContentSpacing(0.f)
-		, _ReadOnly(false)
+			: _TypeComboButtonStyle(nullptr)
+			  , _TypeComboButtonPadding(FMargin(0))
+			  , _TypeComboButtonContentSpacing(0.f)
+			  , _Schema(nullptr)
+			  , _SchemaAction(nullptr)
+			  , _TypeTreeFilter(ETypeTreeFilter::None)
+			  , _bAllowArrays(true)
+			  , _TreeViewWidth(300.f)
+			  , _TreeViewHeight(400.f)
+			  , _Font(FAppStyle::GetFontStyle(TEXT("NormalFont")))
+			  , _SelectorType(ESelectorType::Full)
+			  , _ReadOnly(false) {}
 
-		{
-		}
 		SLATE_STYLE_ARGUMENT(FComboButtonStyle, TypeComboButtonStyle)
 		SLATE_ARGUMENT(FMargin, TypeComboButtonPadding)
 		SLATE_ARGUMENT(float, TypeComboButtonContentSpacing)
@@ -42,7 +39,6 @@ class SDefault_PinTypeSelector : public SPinTypeSelector
 		SLATE_ARGUMENT(TArray<TSharedPtr<class IPinTypeSelectorFilter>>, CustomFilters)
 	SLATE_END_ARGS()
 
-public:
 	SLATE_CONSTRUCT(
 		SLATE_CONSTRUCT_IMP(InArgs, GetPinTypeTreeFunc),
 		const FArguments& InArgs,

@@ -5,21 +5,22 @@
 
 
 #define LOCTEXT_NAMESPACE "Vector2DTextBox"
-template<typename NumericType>
+
+template <typename NumericType>
 class SDefault_Vector2DTextBox : public SCompoundWidget
 {
 public:
 	// Notification for numeric value committed
 	DECLARE_DELEGATE_TwoParams(FOnNumericValueCommitted, NumericType, ETextCommit::Type);
 
-	SLATE_BEGIN_ARGS(SDefault_Vector2DTextBox){}
+	SLATE_BEGIN_ARGS(SDefault_Vector2DTextBox) {}
 		SLATE_ATTRIBUTE(FString, VisibleText_X)
 		SLATE_ATTRIBUTE(FString, VisibleText_Y)
 		SLATE_EVENT(FOnNumericValueCommitted, OnNumericCommitted_Box_X)
 		SLATE_EVENT(FOnNumericValueCommitted, OnNumericCommitted_Box_Y)
 	SLATE_END_ARGS()
 
-		//Construct editable text boxes with the appropriate getter & setter functions along with tool tip text
+	//Construct editable text boxes with the appropriate getter & setter functions along with tool tip text
 	void Construct(const FArguments& InArgs)
 	{
 		const auto& Vector = UPinRestyleSettings::Get()->Inputs.Vector;
@@ -33,35 +34,39 @@ public:
 		VisibleText_Y = InArgs._VisibleText_Y;
 
 		this->ChildSlot
+		[
+			SNew(SHorizontalBox)
+			+ SHorizontalBox::Slot()
+			.AutoWidth()
+			.Padding(0, 0, 0, 0)
+			.HAlign(HAlign_Fill)
 			[
-				SNew(SHorizontalBox)
-				+ SHorizontalBox::Slot()
-				.AutoWidth().Padding(0, 0, 0, 0).HAlign(HAlign_Fill)
+				//Create Text box 0 
+				SNew(SNumericEntryBox<NumericType>)
+				.LabelVAlign(VAlign_Center)
+				.Label()
 				[
-					//Create Text box 0 
-					SNew(SNumericEntryBox<NumericType>)
-					.LabelVAlign(VAlign_Center)
-					.Label()
-					[
-						SNew(STextBlock)
-						.Font(FAppStyle::GetFontStyle(FPinRestyleStyles::Graph_VectorEditableTextBox))
-						.Text(LOCTEXT("VectorNodeXAxisValueLabel", "X"))
-						.ColorAndOpacity(LabelClr)
-					]
-					.LabelPadding(FMargin(0, 0, LabelSpacing, 0))
-					.Value(this, &SDefault_Vector2DTextBox::GetTypeInValue_X)
-					.OnValueCommitted(InArgs._OnNumericCommitted_Box_X)
+					SNew(STextBlock)
 					.Font(FAppStyle::GetFontStyle(FPinRestyleStyles::Graph_VectorEditableTextBox))
-					.UndeterminedString(LOCTEXT("MultipleValues", "Multiple Values"))
-					.ToolTipText(LOCTEXT("VectorNodeXAxisValueLabel_ToolTip", "X value"))
-					.EditableTextBoxStyle(
-						&FAppStyle::GetWidgetStyle<FEditableTextBoxStyle>(
-							FPinRestyleStyles::Graph_VectorEditableTextBox))
-					.BorderForegroundColor(XColor)
-					]
-				+ SHorizontalBox::Slot()
-				.AutoWidth().Padding(BaseSpacing, 0, 0, 0).HAlign(HAlign_Fill)
-				[
+					.Text(LOCTEXT("VectorNodeXAxisValueLabel", "X"))
+					.ColorAndOpacity(LabelClr)
+				]
+				.LabelPadding(FMargin(0, 0, LabelSpacing, 0))
+				.Value(this, &SDefault_Vector2DTextBox::GetTypeInValue_X)
+				.OnValueCommitted(InArgs._OnNumericCommitted_Box_X)
+				.Font(FAppStyle::GetFontStyle(FPinRestyleStyles::Graph_VectorEditableTextBox))
+				.UndeterminedString(LOCTEXT("MultipleValues", "Multiple Values"))
+				.ToolTipText(LOCTEXT("VectorNodeXAxisValueLabel_ToolTip", "X value"))
+				.EditableTextBoxStyle(
+					&FAppStyle::GetWidgetStyle<FEditableTextBoxStyle>(
+						FPinRestyleStyles::Graph_VectorEditableTextBox))
+				.BorderForegroundColor(XColor)
+			]
+			+ SHorizontalBox::Slot()
+			.AutoWidth()
+			.Padding(BaseSpacing, 0, 0, 0)
+			.HAlign(HAlign_Fill)
+			[
 				//Create Text box 1
 				SNew(SNumericEntryBox<NumericType>)
 				.LabelVAlign(VAlign_Center)
@@ -82,38 +87,24 @@ public:
 					&FAppStyle::GetWidgetStyle<FEditableTextBoxStyle>(
 						FPinRestyleStyles::Graph_VectorEditableTextBox))
 				.BorderForegroundColor(YColor)
-				]
-			];
+			]
+		];
 	}
 
-private: 
+private:
 	NumericType GetValueType(const FString& InString) const
 	{
 		static_assert(std::is_floating_point_v<NumericType>);
-		
-		if constexpr (std::is_same_v<float, NumericType>)
-		{
-			return FCString::Atof(*InString);
-		}
-		else if constexpr (std::is_same_v<double, NumericType>)
-		{
-			return FCString::Atod(*InString);
-		}
 
-		return NumericType{};
+		if constexpr (std::is_same_v<float, NumericType>) { return FCString::Atof(*InString); }
+		else if constexpr (std::is_same_v<double, NumericType>) { return FCString::Atod(*InString); }
 	}
 
 	// Get value for X text box
-	TOptional<NumericType> GetTypeInValue_X() const
-	{
-		return GetValueType(VisibleText_X.Get());
-	}
+	TOptional<NumericType> GetTypeInValue_X() const { return GetValueType(VisibleText_X.Get()); }
 
 	// Get value for Y text box
-	TOptional<NumericType> GetTypeInValue_Y() const
-	{
-		return GetValueType(VisibleText_Y.Get());
-	}
+	TOptional<NumericType> GetTypeInValue_Y() const { return GetValueType(VisibleText_Y.Get()); }
 
 	TAttribute<FString> VisibleText_X;
 	TAttribute<FString> VisibleText_Y;
