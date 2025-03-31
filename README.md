@@ -1,11 +1,12 @@
-# Product is "removed" from Marketplace due to inability to receive users's payments. All purchases are on Epic's account, so feel free to ask for refund
-[Apply here](https://github.com/AgitoReiKen/ue-restyle/issues/23)
----------
----------  
----------  
----------  
----------  
-**Restyle** is a plugin for **Unreal Engine** v5.0, v5.1 that brings a brand new look for graph editors.
+# Notice:
+This is a fork of ue-restyle, created by [AgitoReiKen](https://github.com/AgitoReiKen) - [Original repo](https://github.com/AgitoReiKen/ue-restyle).
+
+I made this fork aiming to keep support for the latest Unreal Engine major release.
+
+## Currently supported UE version: 5.5.4
+
+# Original README.md:
+**Restyle** is a plugin for **Unreal Engine** that brings a brand new look for graph editors.
 
 Restyle replaces graph editor's widgets with customizable versions while also leaving overall engine look unchanged.
 
@@ -25,14 +26,8 @@ Come to <a href="https://imgbox.com/g/pXWcf0Yyfg">Image Gallery</a> to see Resty
 1. Goto your unreal engine's project directory (should contain .uproject file in there) 
 
 2. Run **one** of the following commands:
-- For UE v5.0
-```
-git clone --single-branch --branch v5_0 https://github.com/agitoreiken/ue-restyle ./Plugins/Restyle
-```
-- For UE v5.1
-```
-git clone --single-branch --branch v5_1 https://github.com/agitoreiken/ue-restyle ./Plugins/Restyle
-``` 
+git clone https://github.com/rezonated/ue-restyle ./Plugins/Restyle
+
 It will install the plugin into project's Plugin directory.
 
 3. Regenerate & Recompile project and you've got it installed
