@@ -5,7 +5,7 @@ I made this fork aiming to keep support for the latest Unreal Engine major relea
 
 If you're looking for a refund, kindly head to the original repo and follow the instructions found in its README.md.
 
-## Currently supported UE version: 5.5.4
+## Currently supported UE version: 5.6.0
 
 # Original README.md
 **Restyle** is a plugin for **Unreal Engine** that brings a brand new look for graph editors.
