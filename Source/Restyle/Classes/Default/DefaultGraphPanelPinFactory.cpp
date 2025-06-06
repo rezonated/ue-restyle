@@ -7,8 +7,8 @@
 
 #include "Animation/AnimNodeBase.h"
 
+#include "MaterialEditor/MaterialPins/SGraphPinMaterialInput.h"
 #include "MaterialGraph/MaterialGraphSchema.h"
-#include "MaterialPins/SGraphPinMaterialInput.h"
 #include "Pins/SDefault_Pins.h"
 #include "Themes/Default/PinRestyleDefault.h"
 #include "Utils/Private_EdGraphUtilities.h"

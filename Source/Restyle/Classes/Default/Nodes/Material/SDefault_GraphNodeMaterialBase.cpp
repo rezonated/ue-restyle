@@ -271,7 +271,7 @@ void SDefault_GraphNodeMaterialBase::CreatePinWidgets()
 
 void SDefault_GraphNodeMaterialBase::MoveTo(const FVector2D& NewPosition, FNodeSet& NodeFilter, bool bMarkDirty)
 {
-	SGraphNode::MoveTo(NewPosition, NodeFilter, bMarkDirty);
+	SGraphNode::MoveTo(FVector2f(NewPosition.X, NewPosition.Y), NodeFilter, bMarkDirty);
 
 	MaterialNode->MaterialExpression->MaterialExpressionEditorX = MaterialNode->NodePosX;
 	MaterialNode->MaterialExpression->MaterialExpressionEditorY = MaterialNode->NodePosY;

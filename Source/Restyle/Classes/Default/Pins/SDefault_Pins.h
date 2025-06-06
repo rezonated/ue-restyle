@@ -30,7 +30,7 @@
 #include "KismetPins/SGraphPinEnum.h"
 #include "KismetPins/SGraphPinIndex.h"
 #include "KismetPins/SGraphPinKey.h"
-#include "MaterialPins/SGraphPinMaterialInput.h"
+#include "MaterialEditor/MaterialPins/SGraphPinMaterialInput.h"
 //#include "KismetPins/SGraphPinKnot.h"
 #include "KismetPins/SGraphPinColor.h"
 //#include "KismetPins/SGraphPinNum<NumericType>.h"

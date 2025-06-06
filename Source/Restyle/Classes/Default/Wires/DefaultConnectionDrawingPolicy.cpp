@@ -1,8 +1,8 @@
 // Alexander (AgitoReiKen) Moskalenko (C) 2022
 
 #include "DefaultConnectionDrawingPolicy.h"
-#include "ImageUtils.h"
-#include "PackageTools.h"
+
+#include "EdGraphSchema_K2.h"
 
 #include "PathDrawingSlateElement.h"
 #include "SlateMaterialBrush.h"
@@ -10,17 +10,15 @@
 #include "Themes/Default/WireRestyleDefault.h"
 
 #include "Brushes/SlateImageBrush.h"
-#include "Brushes/SlateRoundedBoxBrush.h"
-
-#include "Factories/MaterialFactoryNew.h"
 
 #include "Materials/MaterialInstance.h"
-#include "Materials/MaterialInstanceDynamic.h"
-
-#include "Slate/DeferredCleanupSlateBrush.h"
 
 #include "K2Node_Knot.h"
-#include "UObject/ConstructorHelpers.h"
+#include "TimerManager.h"
+
+#include "HAL/Runnable.h"
+#include "HAL/RunnableThread.h"
+
 #include "Utils/Private_GraphPin.h"
 
 class FPathDrawerHolder
@@ -153,8 +151,7 @@ void FDefaultConnectionDrawingPolicy::UpdateSplineHover(const TArray<FVector2f>&
 			for (int i = 1; i < PointsF.Num(); i++) {
 				const auto& A = PointsF[i - 1];
 				const auto& B = PointsF[i];
-				FVector2D dClosestPoint = FMath::ClosestPointOnSegment2D(LocalMousePosition,
-				                                                         FVector2D(A.X, A.Y), FVector2D(B.X, B.Y));
+				FVector2f  dClosestPoint = FMath::ClosestPointOnSegment2D(LocalMousePosition,FVector2f(A.X, A.Y), FVector2f(B.X, B.Y));
 				ClosestPoint = FVector2f(static_cast<float>(dClosestPoint.X), static_cast<float>(dClosestPoint.Y));
 				float DistanceSquared = FVector2f::DistSquared(ClosestPoint, fLocalMousePosition);
 				if (DistanceSquared < ClosestDistanceSquared) { ClosestDistanceSquared = DistanceSquared; }
@@ -380,7 +377,6 @@ void FDefaultConnectionDrawingPolicy::DrawBubbles(const TArray<FVector2f>& Point
 	const FVector2f BubbleSize = fBubbleImageSize * ZoomFactor * 0.2f * WireParams.WireThickness;
 	const FVector2f BubbleHalfSize = BubbleSize * 0.5;
 	float Time = (FPlatformTime::Seconds() - GStartTime);
-	float Offset = 0.0f;
 	int Drawn = 0;
 
 	while (Drawn != Instances) {
@@ -393,7 +389,7 @@ void FDefaultConnectionDrawingPolicy::DrawBubbles(const TArray<FVector2f>& Point
 			double Length = FVector2f::Distance(A, B);
 			auto Normal = (B - A).GetSafeNormal();
 			if (DrawLength < CurrentLength + Length) {
-				Offset = DrawLength - CurrentLength;
+				float Offset = DrawLength - CurrentLength;
 				Drawn++;
 				FVector2f BubblePos = A + (Normal * Offset) - BubbleHalfSize; // *BubbleOffset);
 				FSlateDrawElement::MakeBox(
@@ -477,7 +473,6 @@ TArray<FVector2f> FDefaultConnectionDrawingPolicy::MakePathPoints(
 	float YDif = End.Y - Start.Y;
 	float YDifA = FMath::Abs(YDif);
 	float XL = MinXL;
-	float YL = YDif * .5f;
 	TArray<FVector2f> PointsF;
 
 	FVector2f Normalized = (End - Start).GetSafeNormal();
@@ -772,8 +767,7 @@ TArray<FVector2f> FDefaultConnectionDrawingPolicy::MakePathPoints(
 	return PointsF;
 }
 
-void FDefaultConnectionDrawingPolicy::DrawPreviewConnector(const FGeometry& PinGeometry, const FVector2D& StartPoint,
-                                                           const FVector2D& EndPoint, UEdGraphPin* Pin)
+void FDefaultConnectionDrawingPolicy::DrawPreviewConnector(const FGeometry& PinGeometry, const FVector2f& StartPoint, const FVector2f& EndPoint, UEdGraphPin* Pin)
 {
 	FKismetConnectionDrawingPolicy::DrawPreviewConnector(PinGeometry, StartPoint, EndPoint, Pin);
 }

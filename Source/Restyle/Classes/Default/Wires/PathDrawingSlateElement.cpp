@@ -451,15 +451,27 @@ void FPathDrawingSlateElement::DrawRenderThread(
 
 		auto [Vertices, Indices] = Path.MakeRenderData();
 		{
-			FRHIResourceCreateInfo CreateInfo(TEXT("Restyle_Path_VertexBuffer"), &Vertices);
-			_VertexBuffer.VertexBufferRHI = RHICmdList.
-				CreateVertexBuffer(Vertices.GetResourceDataSize(), EBufferUsageFlags::Dynamic, CreateInfo);
+			TArray<FScreenVertex> VerticesArray;
+			VerticesArray.Reserve(Vertices.Num());
+			
+			for (const FScreenVertex& Vertex : Vertices)
+			{
+				Vertices.Emplace(Vertex);
+			}
+			
+			_VertexBuffer.VertexBufferRHI = UE::RHIResourceUtils::CreateVertexBufferFromArray(RHICmdList, TEXT("Restyle_Path_VertexBuffer"), EBufferUsageFlags::Dynamic, MakeConstArrayView(VerticesArray));
 		}
 
 		{
-			FRHIResourceCreateInfo CreateInfo(TEXT("Restyle_Path_IndexBuffer"), &Indices);
-			_IndexBuffer.IndexBufferRHI = RHICmdList.CreateIndexBuffer(sizeof(uint32), Indices.GetResourceDataSize(), EBufferUsageFlags::Dynamic,
-			                                                           CreateInfo);
+			TArray<FScreenVertex> IndicesArray;
+			IndicesArray.Reserve(Indices.Num());
+
+			for (const uint32& Index : Indices)
+			{
+				Indices.Emplace(Index);
+			}
+			
+			UE::RHIResourceUtils::CreateIndexBufferFromArray(RHICmdList, TEXT("Restyle_Path_IndexBuffer"), MakeConstArrayView(IndicesArray));
 		}
 		NumVerticesToRender = Vertices.Num();
 		NumPrimitivesToRender = Indices.Num() / 3;
