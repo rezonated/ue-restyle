@@ -27,8 +27,7 @@ public:
 		const FSlateRect& InClippingRect, FSlateWindowElementList& InDrawElements, UEdGraph* InGraphObj);
 
 	virtual void DrawRestyleConnection(const FRestyleConnectionParams& Params, const FConnectionParams& WireParams, TArray<FVector2f>* InPoints = nullptr);
-	virtual void DrawPreviewConnector(const FGeometry& PinGeometry, const FVector2D& StartPoint,
-		const FVector2D& EndPoint, UEdGraphPin* Pin) override;
+	virtual void DrawPreviewConnector(const FGeometry& PinGeometry, const FVector2f& StartPoint, const FVector2f& EndPoint, UEdGraphPin* Pin) override;
 	virtual void ApplyHoverDeemphasis(UEdGraphPin* OutputPin, UEdGraphPin* InputPin, float& Thickness,
 		FLinearColor& WireColor) override;
 

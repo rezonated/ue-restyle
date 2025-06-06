@@ -370,7 +370,7 @@ void SDefault_GraphNodeComment::GetOverlayBrushes(bool bSelected, const FVector2
 void SDefault_GraphNodeComment::MoveTo(const FVector2D& NewPosition, FNodeSet& NodeFilter, bool bMarkDirty)
 {
 	FVector2D PositionDelta = NewPosition - GetPosition();
-	SGraphNode::MoveTo(NewPosition, NodeFilter, bMarkDirty);
+	SGraphNode::MoveTo(FVector2f(NewPosition.X, NewPosition.Y), NodeFilter, bMarkDirty);
 	// Don't drag note content if either of the shift keys are down.
 	FModifierKeysState KeysState = FSlateApplication::Get().GetModifierKeys();
 	if (!KeysState.IsShiftDown())

@@ -1,41 +1,41 @@
 {
-  "FileVersion": 3,
-  "Version": 1,
-  "VersionName": "1.0",
-  "FriendlyName": "Restyle",
-  "Description": "",
-  "Category": "Other",
-  "CreatedBy": "AgitoReiKen",
-  "CreatedByURL": "https://github.com/AgitoReiKen/ue-restyle",
-  "DocsURL": "",
-  "MarketplaceURL": "com.epicgames.launcher://ue/marketplace/product/cac2768eef8947ffab3aee7f5ddd039d",
-  "SupportURL": "https://github.com/AgitoReiKen/ue-restyle",
-  "CanContainContent": false,
-  "IsBetaVersion": false,
-  "IsExperimentalVersion": false,
-  "Installed": false,
-  "Modules": [
-    {
-      "Name": "RestyleShaders",
-      "Type": "DeveloperTool",
-      "LoadingPhase": "PostConfigInit",
-      "WhitelistPlatforms": [
-        "Win64"
-      ],
-      "TargetAllowList": [
-        "Editor"
-      ]
-    },
-    {
-      "Name": "Restyle",
-      "Type": "Editor",
-      "LoadingPhase": "PostEngineInit",
-      "WhitelistPlatforms": [
-        "Win64"
-      ],
-      "AdditionalDependencies": [
-        "RestyleShaders"
-      ]
-    }
-  ]
+	"FileVersion": 3,
+	"Version": 1,
+	"VersionName": "5.6",
+	"FriendlyName": "Restyle",
+	"Description": "Restyle is a plugin for Unreal Engine that brings a brand new look for graph editors. ",
+	"Category": "Editor",
+	"CreatedBy": "rezonated",
+	"CreatedByURL": "https://github.com/rezonated/ue-restyle",
+	"DocsURL": "",
+	"MarketplaceURL": "",
+	"SupportURL": "https://github.com/rezonated/ue-restyle",
+	"CanContainContent": false,
+	"IsBetaVersion": false,
+	"IsExperimentalVersion": false,
+	"Installed": false,
+	"Modules": [
+		{
+			"Name": "RestyleShaders",
+			"Type": "DeveloperTool",
+			"LoadingPhase": "PostConfigInit",
+			"TargetAllowList": [
+				"Editor"
+			],
+			"PlatformAllowList": [
+				"Win64"
+			]
+		},
+		{
+			"Name": "Restyle",
+			"Type": "Editor",
+			"LoadingPhase": "PostEngineInit",
+			"AdditionalDependencies": [
+				"RestyleShaders"
+			],
+			"PlatformAllowList": [
+				"Win64"
+			]
+		}
+	]
 }
