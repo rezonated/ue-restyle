@@ -471,6 +471,11 @@ SDefault_AnimationGraphNodeRestyleBase::SDefault_AnimationGraphNodeRestyleBase()
 	IChevronUp = FAppStyle::GetBrush("Icons.ChevronUp");
 }
 
+void SDefault_AnimationGraphNodeRestyleBase::Construct(const FArguments& InArgs, class UAnimGraphNode_Base* InNode)
+{
+	SAnimationGraphNode::Construct(SAnimationGraphNode::FArguments(), InNode);
+}
+
 void SDefault_AnimationGraphNodeRestyleBase::Tick(const FGeometry& AllottedGeometry, const double InCurrentTime,
                                                   const float InDeltaTime)
 {
