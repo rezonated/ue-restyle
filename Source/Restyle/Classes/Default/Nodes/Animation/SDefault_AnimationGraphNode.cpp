@@ -41,21 +41,12 @@ ACCESS_PRIVATE_FIELD(SAnimationGraphNode, TSharedPtr<SWidget>, CachedContentArea
 
 void SDefault_AnimationGraphNode::Construct(const FArguments& InArgs, UAnimGraphNode_Base* InNode)
 {
-	GraphNode = InNode;
-	const UNodeRestyleSettings* NodeRestyleSettings = UNodeRestyleSettings::Get();
-	CachedState = IsInvalid() ? EDTGraphNodeState::Invalid : EDTGraphNodeState::Normal;
-	CachedOutlineWidth = UDefaultThemeSettings::GetOutlineWidth(
-		NodeRestyleSettings->Node.GetTypeData(GetNodeType()).GetState(CachedState).Body.Get().OutlineWidth
-	);
-	EnabledStateWidgetAdditionalPadding = UDefaultThemeSettings::GetMargin(NodeRestyleSettings->StateWidget.Padding);
-	SetCursor(EMouseCursor::CardinalCross);
-	UpdateGraphNode();
+	SDefault_AnimationGraphNodeRestyleBase::Construct(SDefault_AnimationGraphNodeRestyleBase::FArguments(), InNode);
 
 	ReconfigurePinWidgetsForPropertyBindings(CastChecked<UAnimGraphNode_Base>(GraphNode), SharedThis(this),
-	                                         [this](UEdGraphPin* InPin) { return FindWidgetForPin(InPin); });
+		[this](UEdGraphPin* InPin) { return FindWidgetForPin(InPin); });
 
 	const FSlateBrush* ImageBrush = FAppStyle::Get().GetBrush(TEXT("Graph.AnimationFastPathIndicator"));
-
 	access_private::IndicatorWidget(*this) =
 		SNew(SImage)
 		.Image(ImageBrush)
@@ -63,7 +54,6 @@ void SDefault_AnimationGraphNode::Construct(const FArguments& InArgs, UAnimGraph
 			LOCTEXT("AnimGraphNodeIndicatorTooltip", "Fast path enabled: This node is not using any Blueprint calls to update its data."),
 			nullptr, TEXT("Shared/GraphNodes/Animation"), TEXT("GraphNode_FastPathInfo")))
 		.Visibility(EVisibility::Visible);
-
 
 	PoseViewWidget = SNew(SDefault_PoseWatchOverlay, InNode);
 	access_private::LastHighDetailSize(*this) = FVector2D::ZeroVector;

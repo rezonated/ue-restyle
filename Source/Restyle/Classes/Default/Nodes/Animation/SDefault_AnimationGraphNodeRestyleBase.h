@@ -18,6 +18,7 @@ class SDefault_AnimationGraphNodeRestyleBase : public SAnimationGraphNode
 {
 public:
 	SDefault_AnimationGraphNodeRestyleBase();
+	void Construct(const FArguments& InArgs, class UAnimGraphNode_Base* InNode);
 
 	/* State */
 	virtual void Tick(const FGeometry& AllottedGeometry, const double InCurrentTime, const float InDeltaTime) override;
